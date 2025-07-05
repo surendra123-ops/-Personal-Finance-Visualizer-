@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sun, TrendingUp, Wallet, PlusCircle } from "lucide-react";
+import { TrendingUp, Wallet, PlusCircle } from "lucide-react";
 import AddTransactionForm from "./components/AddTransactionForm";
 import TransactionList from "./components/TransactionList";
 import ExpenseChart from "./components/ExpenseChart";
@@ -16,7 +16,6 @@ function App() {
   const [transactions, setTransactions] = useState([]);
   const [editingTx, setEditingTx] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -76,18 +75,17 @@ function App() {
     (sum, tx) => sum + (tx.amount || 0),
     0
   );
-  const monthlyAverage =
-    transactions.length > 0 ? totalExpenses / 12 : 0;
+  const monthlyAverage = transactions.length > 0 ? totalExpenses / 12 : 0;
 
   return (
-    <div className={`${darkMode ? "dark" : ""}`}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-all duration-500">
+    <div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 transition-all duration-500">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/50 dark:border-slate-700/50"
+          className="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-slate-200/50"
         >
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
@@ -99,37 +97,21 @@ function App() {
                   <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                     Finance Tracker
                   </h1>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 hidden sm:block">
+                  <p className="text-sm text-slate-600 hidden sm:block">
                     Manage your expenses beautifully
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setDarkMode(!darkMode)}
-                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                  aria-label="Toggle dark mode"
-                >
-                  {darkMode ? (
-                    <Sun className="h-5 w-5 text-yellow-500" />
-                  ) : (
-                    <Moon className="h-5 w-5 text-slate-600" />
-                  )}
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowAddForm(!showAddForm)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  <PlusCircle className="h-4 w-4" />
-                  <span className="hidden sm:inline">Add Transaction</span>
-                </motion.button>
-              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowAddForm(!showAddForm)}
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <PlusCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Add Transaction</span>
+              </motion.button>
             </div>
           </div>
         </motion.header>
@@ -142,21 +124,18 @@ function App() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
           >
-            {/* Total Expenses */}
             <StatCard
               title="Total Expenses"
               value={`₹${totalExpenses.toLocaleString()}`}
               icon={<TrendingUp className="h-6 w-6 text-white" />}
               gradient="from-rose-500 to-pink-500"
             />
-            {/* Monthly Avg */}
             <StatCard
               title="Monthly Average"
               value={`₹${monthlyAverage.toLocaleString()}`}
               icon={<Wallet className="h-6 w-6 text-white" />}
               gradient="from-emerald-500 to-teal-500"
             />
-            {/* Count */}
             <StatCard
               title="Total Transactions"
               value={transactions.length}
@@ -228,11 +207,11 @@ function App() {
 
 function StatCard({ title, value, icon, gradient }) {
   return (
-    <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50 dark:border-slate-700/50">
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{title}</p>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
+          <p className="text-sm font-medium text-slate-600">{title}</p>
+          <p className="text-2xl font-bold text-slate-900">{value}</p>
         </div>
         <div className={`p-3 bg-gradient-to-r ${gradient} rounded-xl`}>
           {icon}

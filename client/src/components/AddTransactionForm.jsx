@@ -53,13 +53,13 @@ const AddTransactionForm = ({ onAdd }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-slate-200/50 dark:border-slate-700/50"
+      className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-slate-200/50"
     >
       <div className="flex items-center space-x-3 mb-6">
         <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl">
           <Plus className="h-5 w-5 text-white" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+        <h2 className="text-xl font-bold text-slate-900">
           Add New Transaction
         </h2>
       </div>
@@ -132,7 +132,7 @@ const AddTransactionForm = ({ onAdd }) => {
 
 const FormField = ({ label, icon, type, placeholder, value, onChange, error }) => (
   <div className="space-y-2">
-    <label className="flex items-center space-x-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+    <label className="flex items-center space-x-2 text-sm font-medium text-slate-700">
       {icon}
       <span>{label}</span>
     </label>
@@ -142,13 +142,13 @@ const FormField = ({ label, icon, type, placeholder, value, onChange, error }) =
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm
+        className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 bg-white/50 backdrop-blur-sm
           ${
             error
               ? "border-red-300 focus:border-red-500"
-              : "border-slate-200 dark:border-slate-600 focus:border-blue-500"
+              : "border-slate-200 focus:border-blue-500"
           }
-          focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white placeholder-slate-400`}
+          focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 placeholder-slate-400`}
       />
       {error && (
         <motion.div

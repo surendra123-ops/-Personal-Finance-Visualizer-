@@ -80,28 +80,27 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md border border-slate-200/50 dark:border-slate-700/50"
+            className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md border border-slate-200/50"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-200/50 dark:border-slate-700/50">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200/50">
+              <h2 className="text-xl font-bold text-slate-900">
                 Edit Transaction
               </h2>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleClose}
-                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors"
                 aria-label="Close modal"
               >
-                <X className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                <X className="h-5 w-5 text-slate-600" />
               </motion.button>
             </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              {/* Amount Input */}
               <InputField
                 label="Amount"
                 type="number"
@@ -111,8 +110,6 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
                 onChange={setAmount}
                 error={errors.amount}
               />
-
-              {/* Description Input */}
               <InputField
                 label="Description"
                 type="text"
@@ -122,8 +119,6 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
                 onChange={setDescription}
                 error={errors.description}
               />
-
-              {/* Date Input */}
               <InputField
                 label="Date"
                 type="date"
@@ -140,7 +135,7 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
                   onClick={handleClose}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 rounded-xl font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                  className="px-6 py-3 rounded-xl font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
                 >
                   Cancel
                 </motion.button>
@@ -177,9 +172,17 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
   );
 };
 
-const InputField = ({ label, icon, type, placeholder, value, onChange, error }) => (
+const InputField = ({
+  label,
+  icon,
+  type,
+  placeholder,
+  value,
+  onChange,
+  error,
+}) => (
   <div className="space-y-2">
-    <label className="flex items-center space-x-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+    <label className="flex items-center space-x-2 text-sm font-medium text-slate-700">
       {icon}
       <span>{label}</span>
     </label>
@@ -189,13 +192,13 @@ const InputField = ({ label, icon, type, placeholder, value, onChange, error }) 
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm
+        className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 bg-white/50 backdrop-blur-sm
           ${
             error
               ? "border-red-300 focus:border-red-500"
-              : "border-slate-200 dark:border-slate-600 focus:border-blue-500"
+              : "border-slate-200 focus:border-blue-500"
           }
-          focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white placeholder-slate-400`}
+          focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 placeholder-slate-400`}
       />
       {error && (
         <motion.div

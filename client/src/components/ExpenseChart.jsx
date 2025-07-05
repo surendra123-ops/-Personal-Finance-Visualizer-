@@ -38,9 +38,9 @@ const getMonthlyData = (transactions) => {
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-xl p-3 shadow-lg">
-        <p className="text-sm font-medium text-slate-900 dark:text-white">{label}</p>
-        <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+      <div className="bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-xl p-3 shadow-lg">
+        <p className="text-sm font-medium text-slate-900">{label}</p>
+        <p className="text-lg font-bold text-blue-600">
           ₹{payload[0].value.toLocaleString()}
         </p>
       </div>
@@ -62,7 +62,7 @@ const ExpenseChart = ({ transactions }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.4 }}
-      className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50 dark:border-slate-700/50"
+      className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -71,10 +71,10 @@ const ExpenseChart = ({ transactions }) => {
             <BarChart3 className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+            <h2 className="text-xl font-bold text-slate-900">
               Monthly Expenses
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-sm text-slate-600">
               Track your spending patterns
             </p>
           </div>
@@ -82,8 +82,8 @@ const ExpenseChart = ({ transactions }) => {
 
         {highestMonth.total > 0 && (
           <div className="text-right">
-            <p className="text-xs text-slate-500 dark:text-slate-400">Highest</p>
-            <p className="text-sm font-semibold text-slate-900 dark:text-white">
+            <p className="text-xs text-slate-500">Highest</p>
+            <p className="text-sm font-semibold text-slate-900">
               {highestMonth.month} - ₹{highestMonth.total.toLocaleString()}
             </p>
           </div>
@@ -103,13 +103,11 @@ const ExpenseChart = ({ transactions }) => {
                 dataKey="month"
                 stroke="#64748b"
                 tick={{ fontSize: 12 }}
-                className="dark:stroke-slate-400"
               />
               <YAxis
                 stroke="#64748b"
                 tick={{ fontSize: 12 }}
                 tickFormatter={(value) => `₹${value.toLocaleString()}`}
-                className="dark:stroke-slate-400"
               />
               <Tooltip content={<CustomTooltip />} />
               <defs>
@@ -128,13 +126,13 @@ const ExpenseChart = ({ transactions }) => {
           </ResponsiveContainer>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="p-4 bg-slate-100 dark:bg-slate-700 rounded-2xl mb-4">
+            <div className="p-4 bg-slate-100 rounded-2xl mb-4">
               <TrendingUp className="h-12 w-12 text-slate-400" />
             </div>
-            <p className="text-slate-500 dark:text-slate-400 font-medium mb-2">
+            <p className="text-slate-500 font-medium mb-2">
               No expense data yet
             </p>
-            <p className="text-sm text-slate-400 dark:text-slate-500">
+            <p className="text-sm text-slate-400">
               Add some transactions to see your spending patterns
             </p>
           </div>
@@ -143,12 +141,10 @@ const ExpenseChart = ({ transactions }) => {
 
       {/* Summary Footer */}
       {totalExpenses > 0 && (
-        <div className="mt-6 pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
+        <div className="mt-6 pt-4 border-t border-slate-200/50">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-slate-600 dark:text-slate-400">
-              Total Expenses
-            </span>
-            <span className="font-bold text-slate-900 dark:text-white">
+            <span className="text-slate-600">Total Expenses</span>
+            <span className="font-bold text-slate-900">
               ₹{totalExpenses.toLocaleString()}
             </span>
           </div>
