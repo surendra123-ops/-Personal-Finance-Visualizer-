@@ -69,7 +69,7 @@ finance-app/
 #### ✅ Clone Repository
 
 ```bash
-git clone 
+git clone https://github.com/surendra123-ops/-Personal-Finance-Visualizer-.git
 cd personal-finance-visualizer
 ```
 
