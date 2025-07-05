@@ -152,12 +152,4 @@ npm run dev
 
 **Surendra Yenika**
 🌐 [LinkedIn](https://www.linkedin.com/in/surendra-yenika/)
-💼 Full Stack Developer | MERN | DevOps
 
-
-
-MIT License – Free to use and modify!
-
----
-
-If you want, I can also help publish this on **GitHub** with a professional structure and commits. Let me know!
