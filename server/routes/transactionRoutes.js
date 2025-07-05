@@ -3,20 +3,64 @@ const router = express.Router();
 const Transaction = require("../models/Transaction");
 
 // GET all transactions
+// GET all transactions (optionally filtered by month)
 router.get("/", async (req, res) => {
-  const transactions = await Transaction.find().sort({ date: -1 });
-  res.json(transactions);
+  try {
+    const { month } = req.query;
+
+    let query = {};
+
+    if (month) {
+      const start = new Date(`${month}-01`);
+      const end = new Date(start);
+      end.setMonth(end.getMonth() + 1);
+
+      query.date = {
+        $gte: start,
+        $lt: end,
+      };
+    }
+
+    const transactions = await Transaction.find(query).sort({ date: -1 });
+    res.json(transactions);
+  } catch (err) {
+    console.error("❌ Error fetching transactions:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
+
+
+// POST a new transaction
 // POST a new transaction
 router.post("/", async (req, res) => {
   try {
-    const newTx = await Transaction.create(req.body);
-    res.status(201).json(newTx);
+    const { amount, description, date, category } = req.body;
+
+    console.log("🧾 Incoming transaction:", req.body); // debug
+
+    // ✅ Basic validation
+    if (!amount || !description || !date || !category) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // ✅ Optional: force correct types
+    const transaction = new Transaction({
+      amount: Number(amount),
+      description,
+      date: new Date(date),
+      category
+    });
+
+    const saved = await transaction.save();
+    res.status(201).json(saved);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error("❌ Error creating transaction:", err);
+    res.status(500).json({ error: err.message });
   }
 });
+
+
 
 // PUT (update) a transaction
 router.put("/:id", async (req, res) => {

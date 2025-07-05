@@ -1,17 +1,14 @@
+// components/AddTransactionForm.jsx
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Plus,
-  DollarSign,
-  FileText,
-  Calendar,
-  AlertCircle,
-  Folder
+  Plus, DollarSign, FileText, Calendar, AlertCircle, Folder
 } from "lucide-react";
 
+// Static categories for now
 const categories = ["Food", "Travel", "Shopping", "Bills", "Entertainment", "Other"];
 
-const AddTransactionForm = ({ onAdd }) => {
+const AddTransactionForm = ({ onAdd, month }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
@@ -19,20 +16,26 @@ const AddTransactionForm = ({ onAdd }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const getMonthLimits = (monthStr) => {
+    const [year, month] = monthStr.split("-").map(Number);
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 0);
+    return {
+      minDate: start.toISOString().split("T")[0],
+      maxDate: end.toISOString().split("T")[0],
+    };
+  };
+
+  const { minDate, maxDate } = getMonthLimits(month);
+
   const validateForm = () => {
     const newErrors = {};
-    if (!amount || isNaN(amount) || Number(amount) <= 0) {
-      newErrors.amount = "Please enter a valid amount";
-    }
-    if (!description.trim()) {
-      newErrors.description = "Description is required";
-    }
-    if (!date) {
-      newErrors.date = "Date is required";
-    }
-    if (!category) {
-      newErrors.category = "Category is required";
-    }
+    if (!amount || isNaN(amount) || Number(amount) <= 0) newErrors.amount = "Please enter a valid amount";
+    if (!description.trim()) newErrors.description = "Description is required";
+    if (!date) newErrors.date = "Date is required";
+    else if (date < minDate || date > maxDate)
+      newErrors.date = `Date must be between ${minDate} and ${maxDate}`;
+    if (!category) newErrors.category = "Category is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -40,15 +43,9 @@ const AddTransactionForm = ({ onAdd }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
     setIsSubmitting(true);
     try {
-      await onAdd({
-        amount: Number(amount),
-        description,
-        date,
-        category,
-      });
+      await onAdd({ amount: Number(amount), description, date, category });
       setAmount("");
       setDescription("");
       setDate("");
@@ -86,7 +83,6 @@ const AddTransactionForm = ({ onAdd }) => {
             onChange={setAmount}
             error={errors.amount}
           />
-
           <FormField
             label="Description"
             icon={<FileText className="h-4 w-4" />}
@@ -96,7 +92,6 @@ const AddTransactionForm = ({ onAdd }) => {
             onChange={setDescription}
             error={errors.description}
           />
-
           <FormField
             label="Date"
             icon={<Calendar className="h-4 w-4" />}
@@ -104,6 +99,8 @@ const AddTransactionForm = ({ onAdd }) => {
             value={date}
             onChange={setDate}
             error={errors.date}
+            min={minDate}
+            max={maxDate}
           />
         </div>
 
@@ -169,7 +166,7 @@ const AddTransactionForm = ({ onAdd }) => {
   );
 };
 
-const FormField = ({ label, icon, type, placeholder, value, onChange, error }) => (
+const FormField = ({ label, icon, type, placeholder, value, onChange, error, min, max }) => (
   <div className="space-y-2">
     <label className="flex items-center space-x-2 text-sm font-medium text-slate-700">
       {icon}
@@ -181,6 +178,8 @@ const FormField = ({ label, icon, type, placeholder, value, onChange, error }) =
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        min={min}
+        max={max}
         className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 bg-white/50 backdrop-blur-sm
           ${error ? "border-red-300 focus:border-red-500" : "border-slate-200 focus:border-blue-500"}
           focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 placeholder-slate-400`}

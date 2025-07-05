@@ -1,3 +1,4 @@
+// App.jsx
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -5,6 +6,8 @@ import {
   Wallet,
   PlusCircle,
   Clock,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 import AddTransactionForm from "./components/AddTransactionForm";
@@ -14,6 +17,7 @@ import CategoryPieChart from "./components/CategoryPieChart";
 import EditTransactionModal from "./components/EditTransactionModal";
 import BudgetForm from "./components/BudgetForm";
 import BudgetChart from "./components/BudgetChart";
+
 import {
   getTransactions,
   addTransaction,
@@ -24,8 +28,9 @@ import {
 import {
   getBudgetsByMonth as getBudgets,
   setBudget as addBudget,
-} from "./services/budgetApi"; // ✅ correct source
+} from "./services/budgetApi";
 
+const getCurrentMonth = () => new Date().toISOString().slice(0, 7);
 
 function App() {
   const [transactions, setTransactions] = useState([]);
@@ -34,18 +39,18 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [budgets, setBudgets] = useState([]);
-  const month = "2025-07"; // Static month for now; make dynamic if needed
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
 
   useEffect(() => {
     loadTransactions();
     loadBudgets();
-  }, []);
+  }, [selectedMonth]);
 
   const loadTransactions = async () => {
     try {
       setIsLoading(true);
-      const data = await getTransactions();
-      setTransactions(Array.isArray(data) ? data : []);
+      const data = await getTransactions(selectedMonth);
+      setTransactions(data);
     } catch (error) {
       console.error("Error loading transactions:", error);
     } finally {
@@ -55,7 +60,7 @@ function App() {
 
   const loadBudgets = async () => {
     try {
-      const data = await getBudgets(month);
+      const data = await getBudgets(selectedMonth);
       setBudgets(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error loading budgets:", error);
@@ -100,208 +105,199 @@ function App() {
 
   const handleBudgetSave = async (budget) => {
     try {
-      await addBudget({ ...budget, month });
+      await addBudget({ ...budget, month: selectedMonth });
       await loadBudgets();
     } catch (error) {
       console.error("Error saving budget:", error);
     }
   };
 
+  const changeMonth = (offset) => {
+    const date = new Date(selectedMonth + "-01");
+    date.setMonth(date.getMonth() + offset);
+    setSelectedMonth(date.toISOString().slice(0, 7));
+  };
+
   const totalExpenses = transactions.reduce(
     (sum, tx) => sum + (tx.amount || 0),
     0
   );
-  const monthlyAverage = transactions.length > 0 ? totalExpenses / 12 : 0;
+  const monthlyAverage = totalExpenses / 12;
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 5);
 
   return (
-    <div>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 transition-all duration-500">
-        {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-slate-200/50"
-        >
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl">
-                  <Wallet className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    Finance Tracker
-                  </h1>
-                  <p className="text-sm text-slate-600 hidden sm:block">
-                    Manage your expenses beautifully
-                  </p>
-                </div>
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowAddForm(!showAddForm)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                <PlusCircle className="h-4 w-4" />
-                <span className="hidden sm:inline">Add Transaction</span>
-              </motion.button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 transition-all duration-500">
+      {/* Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-slate-200/50"
+      >
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl">
+              <Wallet className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text">
+                Finance Tracker
+              </h1>
+              <p className="text-sm text-slate-600 hidden sm:block">
+                Manage your expenses beautifully
+              </p>
             </div>
           </div>
-        </motion.header>
 
-        {/* Stats */}
-        <div className="container mx-auto px-4 py-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => changeMonth(-1)}
+              className="p-2 rounded-full hover:bg-slate-200"
+            >
+              <ChevronLeft />
+            </button>
+            <input
+              type="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="border rounded-lg px-3 py-1 text-sm"
+            />
+            <button
+              onClick={() => changeMonth(1)}
+              className="p-2 rounded-full hover:bg-slate-200"
+            >
+              <ChevronRight />
+            </button>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg"
           >
-            <StatCard
-              title="Total Expenses"
-              value={`₹${totalExpenses.toLocaleString()}`}
-              icon={<TrendingUp className="h-6 w-6 text-white" />}
-              gradient="from-rose-500 to-pink-500"
-            />
-            <StatCard
-              title="Monthly Average"
-              value={`₹${monthlyAverage.toLocaleString()}`}
-              icon={<Wallet className="h-6 w-6 text-white" />}
-              gradient="from-emerald-500 to-teal-500"
-            />
-            <StatCard
-              title="Total Transactions"
-              value={transactions.length}
-              icon={<TrendingUp className="h-6 w-6 text-white" />}
-              gradient="from-blue-500 to-indigo-500"
-            />
-          </motion.div>
+            <PlusCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">Add Transaction</span>
+          </motion.button>
+        </div>
+      </motion.header>
 
-          {/* Add Form */}
-          <AnimatePresence>
-            {showAddForm && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="mb-8"
-              >
-                <AddTransactionForm onAdd={handleAdd} />
-              </motion.div>
-            )}
-          </AnimatePresence>
+      <div className="container mx-auto px-4 py-8">
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <StatCard
+            title="Total Expenses"
+            value={`₹${totalExpenses.toLocaleString()}`}
+            icon={<TrendingUp className="h-6 w-6 text-white" />}
+            gradient="from-rose-500 to-pink-500"
+          />
+          <StatCard
+            title="Monthly Average"
+            value={`₹${monthlyAverage.toLocaleString()}`}
+            icon={<Wallet className="h-6 w-6 text-white" />}
+            gradient="from-emerald-500 to-teal-500"
+          />
+          <StatCard
+            title="Total Transactions"
+            value={transactions.length}
+            icon={<TrendingUp className="h-6 w-6 text-white" />}
+            gradient="from-blue-500 to-indigo-500"
+          />
+        </div>
 
-          {/* Charts */}
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-              <div className="xl:col-span-1">
-                <ExpenseChart transactions={transactions} />
-                <div className="mt-8">
-                  <CategoryPieChart transactions={transactions} />
-                </div>
+        <AnimatePresence>
+          {showAddForm && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mb-8"
+            >
+              <AddTransactionForm onAdd={handleAdd} month={selectedMonth} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-                {/* Budget Section */}
-                <div className="mt-8 space-y-6">
-                  <h2 className="text-xl font-semibold text-slate-800">
-                    Budget Settings
-                  </h2>
-                  <BudgetForm onSave={handleBudgetSave} />
-                  <BudgetChart
-                    budgets={budgets}
-                    transactions={transactions}
-                    month={month}
-                  />
-                </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div>
+              <ExpenseChart transactions={transactions} month={selectedMonth} />
+              <div className="mt-8">
+                <CategoryPieChart transactions={transactions} month={selectedMonth} />
               </div>
-
-              <div className="xl:col-span-1">
-                <TransactionList
+              <div className="mt-8 space-y-6">
+                <h2 className="text-xl font-semibold text-slate-800">Budget Settings</h2>
+                <BudgetForm onSave={handleBudgetSave} month={selectedMonth} />
+                <BudgetChart
+                  budgets={budgets}
                   transactions={transactions}
-                  onDelete={handleDelete}
-                  onEdit={handleEditClick}
+                  month={selectedMonth}
                 />
               </div>
             </div>
-          )}
 
-          {/* Recent Transactions */}
-          {!isLoading && recentTransactions.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="mt-12"
-            >
-              <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                <Clock className="h-4 w-4 text-blue-500" />
-                Recent Transactions
-              </h2>
-              <ul className="space-y-2">
-                {recentTransactions.map((tx) => (
-                  <li
-                    key={tx._id}
-                    className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow border border-slate-200/50"
-                  >
-                    <div className="flex justify-between">
-                      <div>
-                        <p className="text-slate-800 font-medium">
-                          {tx.description}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {new Date(tx.date).toLocaleDateString()} &middot;{" "}
-                          {tx.category}
-                        </p>
-                      </div>
-                      <p className="font-semibold text-blue-600">
-                        ₹{tx.amount}
+            <TransactionList
+              transactions={transactions}
+              onDelete={handleDelete}
+              onEdit={handleEditClick}
+              month={selectedMonth}
+            />
+          </div>
+        )}
+
+        {!isLoading && recentTransactions.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-12"
+          >
+            <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+              <Clock className="h-4 w-4 text-blue-500" />
+              Recent Transactions
+            </h2>
+            <ul className="space-y-2">
+              {recentTransactions.map((tx) => (
+                <li
+                  key={tx._id}
+                  className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow border border-slate-200/50"
+                >
+                  <div className="flex justify-between">
+                    <div>
+                      <p className="text-slate-800 font-medium">{tx.description}</p>
+                      <p className="text-xs text-slate-500">
+                        {new Date(tx.date).toLocaleDateString()} &middot; {tx.category}
                       </p>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Edit Modal */}
-        <EditTransactionModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSave={handleSaveEdit}
-          transaction={editingTx}
-        />
-
-        {/* Scroll to top */}
-        <motion.button
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 p-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 lg:hidden"
-          aria-label="Scroll to top"
-        >
-          <TrendingUp className="h-5 w-5" />
-        </motion.button>
+                    <p className="font-semibold text-blue-600">₹{tx.amount}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
       </div>
+
+      <EditTransactionModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSaveEdit}
+        transaction={editingTx}
+      />
     </div>
   );
 }
 
 function StatCard({ title, value, icon, gradient }) {
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50">
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-slate-200/50">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-slate-600">{title}</p>

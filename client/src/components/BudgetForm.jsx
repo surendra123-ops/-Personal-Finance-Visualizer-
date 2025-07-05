@@ -1,11 +1,11 @@
+// components/BudgetForm.jsx
 import { useState } from "react";
 import { setBudget } from "../services/budgetApi";
-import { Folder, Calendar, DollarSign, Check } from "lucide-react";
+import { Folder, DollarSign, Check, Calendar } from "lucide-react";
 
 const categories = ["Food", "Bills", "Transport", "Shopping", "Entertainment", "Other"];
 
-const BudgetForm = ({ onSave }) => {
-  const [month, setMonth] = useState("");
+const BudgetForm = ({ month, onSave }) => {
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
@@ -17,7 +17,10 @@ const BudgetForm = ({ onSave }) => {
     try {
       await setBudget({ month, category, amount: Number(amount) });
       setMessage("Budget saved!");
-      onSave?.(); // safe call if onSave exists
+      onSave?.();
+
+      setCategory("");
+      setAmount("");
       setTimeout(() => setMessage(""), 2000);
     } catch (err) {
       console.error("Budget save failed:", err);
@@ -25,16 +28,22 @@ const BudgetForm = ({ onSave }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md space-y-4 border border-slate-200">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-xl shadow-md space-y-4 border border-slate-200"
+    >
       <h2 className="font-semibold text-lg text-slate-800">Set Monthly Budget</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <input
-          type="month"
-          className="px-4 py-2 border rounded-xl"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-        />
+        <div className="flex items-center space-x-2 px-4 py-2 bg-slate-100 border rounded-xl text-slate-700">
+          <Calendar className="h-4 w-4 text-slate-500" />
+          <span>
+            {new Date(`${month}-01`).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+            })}
+          </span>
+        </div>
 
         <select
           value={category}
@@ -43,7 +52,9 @@ const BudgetForm = ({ onSave }) => {
         >
           <option value="">Select Category</option>
           {categories.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
         </select>
 
@@ -56,7 +67,10 @@ const BudgetForm = ({ onSave }) => {
         />
       </div>
 
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700">
+      <button
+        type="submit"
+        className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
+      >
         Save Budget
       </button>
 

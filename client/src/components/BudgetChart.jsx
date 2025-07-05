@@ -1,9 +1,17 @@
-// src/components/BudgetChart.jsx
+// components/BudgetChart.jsx
 import React from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  CartesianGrid,
+} from "recharts";
 
 const BudgetChart = ({ budgets = [], transactions = [], month }) => {
-  // Group budgets by category
   const budgetMap = {};
   budgets.forEach((b) => {
     if (b.month === month) {
@@ -11,16 +19,19 @@ const BudgetChart = ({ budgets = [], transactions = [], month }) => {
     }
   });
 
-  // Sum actual expenses by category
   const actuals = {};
-  transactions.forEach((tx) => {
-    const cat = tx.category || "Other";
-    if (!actuals[cat]) actuals[cat] = 0;
-    actuals[cat] += tx.amount || 0;
-  });
+  transactions
+    .filter((tx) => tx.date?.startsWith(month))
+    .forEach((tx) => {
+      const cat = tx.category || "Other";
+      if (!actuals[cat]) actuals[cat] = 0;
+      actuals[cat] += tx.amount || 0;
+    });
 
-  // Merge data
-  const categories = Array.from(new Set([...Object.keys(budgetMap), ...Object.keys(actuals)]));
+  const categories = Array.from(
+    new Set([...Object.keys(budgetMap), ...Object.keys(actuals)])
+  );
+
   const chartData = categories.map((category) => ({
     category,
     Budget: budgetMap[category] || 0,
@@ -29,12 +40,17 @@ const BudgetChart = ({ budgets = [], transactions = [], month }) => {
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-md border border-slate-200">
-      <h2 className="text-lg font-semibold text-slate-800 mb-4">Budget vs Actual Spending</h2>
+      <h2 className="text-lg font-semibold text-slate-800 mb-4">
+        Budget vs Actual Spending ({month})
+      </h2>
       {chartData.length === 0 ? (
-        <p className="text-slate-500">No data to display.</p>
+        <p className="text-slate-500">No data to display for this month.</p>
       ) : (
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="category" />
             <YAxis />
