@@ -10,6 +10,9 @@ const getMonthlyData = (transactions) => {
 
   const monthlyTotals = {};
 
+  // ✅ FIX: Check if transactions is an array
+  if (!Array.isArray(transactions)) return [];
+
   transactions.forEach((tx) => {
     const date = new Date(tx.date);
     const month = months[date.getMonth()];
@@ -24,6 +27,7 @@ const getMonthlyData = (transactions) => {
     total: monthlyTotals[m] || 0,
   }));
 };
+
 
 const ExpenseChart = ({ transactions }) => {
   const data = useMemo(() => getMonthlyData(transactions), [transactions]);

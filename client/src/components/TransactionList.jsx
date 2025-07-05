@@ -1,6 +1,9 @@
 import { Pencil, Trash2 } from "lucide-react";
 
 const TransactionList = ({ transactions, onDelete, onEdit }) => {
+  // ✅ Guard clause to prevent .map error
+  if (!Array.isArray(transactions)) return null;
+
   return (
     <div className="max-w-xl w-full mx-auto mt-8 bg-white shadow-md rounded-2xl p-4">
       <h2 className="text-lg font-semibold text-gray-700 mb-4">Transaction History</h2>
