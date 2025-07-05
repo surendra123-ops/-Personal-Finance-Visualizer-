@@ -1,33 +1,58 @@
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Moon, Sun, TrendingUp, Wallet, PlusCircle } from "lucide-react";
 import AddTransactionForm from "./components/AddTransactionForm";
 import TransactionList from "./components/TransactionList";
 import ExpenseChart from "./components/ExpenseChart";
 import EditTransactionModal from "./components/EditTransactionModal";
-import { getTransactions, addTransaction, deleteTransaction, updateTransaction } from "./services/api";
+import {
+  getTransactions,
+  addTransaction,
+  deleteTransaction,
+  updateTransaction,
+} from "./services/api";
 
 function App() {
   const [transactions, setTransactions] = useState([]);
   const [editingTx, setEditingTx] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
     loadTransactions();
   }, []);
 
   const loadTransactions = async () => {
-    const data = await getTransactions();
-    setTransactions(Array.isArray(data) ? data : []);
+    try {
+      setIsLoading(true);
+      const data = await getTransactions();
+      setTransactions(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error loading transactions:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAdd = async (tx) => {
-    await addTransaction(tx);
-    await loadTransactions();
+    try {
+      await addTransaction(tx);
+      await loadTransactions();
+      setShowAddForm(false);
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+    }
   };
 
   const handleDelete = async (id) => {
-    await deleteTransaction(id);
-    setTransactions(transactions.filter((tx) => tx._id !== id));
+    try {
+      await deleteTransaction(id);
+      setTransactions(transactions.filter((tx) => tx._id !== id));
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+    }
   };
 
   const handleEditClick = (tx) => {
@@ -36,56 +61,183 @@ function App() {
   };
 
   const handleSaveEdit = async (updatedTx) => {
-    const result = await updateTransaction(updatedTx._id, updatedTx);
-    setTransactions(transactions.map((t) => (t._id === result._id ? result : t)));
-    setModalOpen(false);
+    try {
+      const result = await updateTransaction(updatedTx._id, updatedTx);
+      setTransactions((prev) =>
+        prev.map((t) => (t._id === result._id ? result : t))
+      );
+      setModalOpen(false);
+    } catch (error) {
+      console.error("Error updating transaction:", error);
+    }
   };
 
+  const totalExpenses = transactions.reduce(
+    (sum, tx) => sum + (tx.amount || 0),
+    0
+  );
+  const monthlyAverage =
+    transactions.length > 0 ? totalExpenses / 12 : 0;
+
   return (
-    <div className={`${darkMode ? "dark bg-gray-900 text-white" : "bg-gray-50 text-gray-900"} min-h-screen transition-all duration-300 font-sans`}>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
-        <header className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-blue-600 dark:text-blue-400 mb-4 sm:mb-0">
-            Personal Finance Visualizer 💰
-          </h1>
-          <button
-            className="flex items-center px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200"
-            onClick={() => setDarkMode(!darkMode)}
+    <div className={`${darkMode ? "dark" : ""}`}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-all duration-500">
+        {/* Header */}
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/50 dark:border-slate-700/50"
+        >
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl">
+                  <Wallet className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    Finance Tracker
+                  </h1>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 hidden sm:block">
+                    Manage your expenses beautifully
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setDarkMode(!darkMode)}
+                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  aria-label="Toggle dark mode"
+                >
+                  {darkMode ? (
+                    <Sun className="h-5 w-5 text-yellow-500" />
+                  ) : (
+                    <Moon className="h-5 w-5 text-slate-600" />
+                  )}
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowAddForm(!showAddForm)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  <span className="hidden sm:inline">Add Transaction</span>
+                </motion.button>
+              </div>
+            </div>
+          </div>
+        </motion.header>
+
+        {/* Stats */}
+        <div className="container mx-auto px-4 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
           >
-            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-          </button>
-        </header>
-
-        <main className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-          <section>
-            <AddTransactionForm onAdd={handleAdd} />
-            <ExpenseChart transactions={transactions} />
-          </section>
-          <section>
-            <TransactionList
-              transactions={transactions}
-              onDelete={handleDelete}
-              onEdit={handleEditClick}
+            {/* Total Expenses */}
+            <StatCard
+              title="Total Expenses"
+              value={`₹${totalExpenses.toLocaleString()}`}
+              icon={<TrendingUp className="h-6 w-6 text-white" />}
+              gradient="from-rose-500 to-pink-500"
             />
-          </section>
-        </main>
+            {/* Monthly Avg */}
+            <StatCard
+              title="Monthly Average"
+              value={`₹${monthlyAverage.toLocaleString()}`}
+              icon={<Wallet className="h-6 w-6 text-white" />}
+              gradient="from-emerald-500 to-teal-500"
+            />
+            {/* Count */}
+            <StatCard
+              title="Total Transactions"
+              value={transactions.length}
+              icon={<TrendingUp className="h-6 w-6 text-white" />}
+              gradient="from-blue-500 to-indigo-500"
+            />
+          </motion.div>
 
+          {/* Add Form */}
+          <AnimatePresence>
+            {showAddForm && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mb-8"
+              >
+                <AddTransactionForm onAdd={handleAdd} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Chart + List */}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <div className="xl:col-span-1">
+                <ExpenseChart transactions={transactions} />
+              </div>
+              <div className="xl:col-span-1">
+                <TransactionList
+                  transactions={transactions}
+                  onDelete={handleDelete}
+                  onEdit={handleEditClick}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Edit Modal */}
         <EditTransactionModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           onSave={handleSaveEdit}
           transaction={editingTx}
         />
+
+        {/* Scroll to top */}
+        <motion.button
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 p-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 lg:hidden"
+          aria-label="Scroll to top"
+        >
+          <TrendingUp className="h-5 w-5" />
+        </motion.button>
       </div>
+    </div>
+  );
+}
 
-      <button
-        onClick={() => document.getElementById("scroll-top").scrollIntoView({ behavior: "smooth" })}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 md:hidden"
-      >
-        ⬆️
-      </button>
-
-      <div id="scroll-top"></div>
+function StatCard({ title, value, icon, gradient }) {
+  return (
+    <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50 dark:border-slate-700/50">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{title}</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
+        </div>
+        <div className={`p-3 bg-gradient-to-r ${gradient} rounded-xl`}>
+          {icon}
+        </div>
+      </div>
     </div>
   );
 }
