@@ -6,11 +6,14 @@ import {
   PlusCircle,
   Clock,
 } from "lucide-react";
+
 import AddTransactionForm from "./components/AddTransactionForm";
 import TransactionList from "./components/TransactionList";
 import ExpenseChart from "./components/ExpenseChart";
 import CategoryPieChart from "./components/CategoryPieChart";
 import EditTransactionModal from "./components/EditTransactionModal";
+import BudgetForm from "./components/BudgetForm";
+import BudgetChart from "./components/BudgetChart";
 import {
   getTransactions,
   addTransaction,
@@ -18,15 +21,24 @@ import {
   updateTransaction,
 } from "./services/api";
 
+import {
+  getBudgetsByMonth as getBudgets,
+  setBudget as addBudget,
+} from "./services/budgetApi"; // ✅ correct source
+
+
 function App() {
   const [transactions, setTransactions] = useState([]);
   const [editingTx, setEditingTx] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [budgets, setBudgets] = useState([]);
+  const month = "2025-07"; // Static month for now; make dynamic if needed
 
   useEffect(() => {
     loadTransactions();
+    loadBudgets();
   }, []);
 
   const loadTransactions = async () => {
@@ -38,6 +50,15 @@ function App() {
       console.error("Error loading transactions:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadBudgets = async () => {
+    try {
+      const data = await getBudgets(month);
+      setBudgets(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error loading budgets:", error);
     }
   };
 
@@ -74,6 +95,15 @@ function App() {
       setModalOpen(false);
     } catch (error) {
       console.error("Error updating transaction:", error);
+    }
+  };
+
+  const handleBudgetSave = async (budget) => {
+    try {
+      await addBudget({ ...budget, month });
+      await loadBudgets();
+    } catch (error) {
+      console.error("Error saving budget:", error);
     }
   };
 
@@ -180,7 +210,21 @@ function App() {
                 <div className="mt-8">
                   <CategoryPieChart transactions={transactions} />
                 </div>
+
+                {/* Budget Section */}
+                <div className="mt-8 space-y-6">
+                  <h2 className="text-xl font-semibold text-slate-800">
+                    Budget Settings
+                  </h2>
+                  <BudgetForm onSave={handleBudgetSave} />
+                  <BudgetChart
+                    budgets={budgets}
+                    transactions={transactions}
+                    month={month}
+                  />
+                </div>
               </div>
+
               <div className="xl:col-span-1">
                 <TransactionList
                   transactions={transactions}
@@ -191,7 +235,7 @@ function App() {
             </div>
           )}
 
-          {/* Recent Transactions (Optional Card Style) */}
+          {/* Recent Transactions */}
           {!isLoading && recentTransactions.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -211,12 +255,17 @@ function App() {
                   >
                     <div className="flex justify-between">
                       <div>
-                        <p className="text-slate-800 font-medium">{tx.description}</p>
+                        <p className="text-slate-800 font-medium">
+                          {tx.description}
+                        </p>
                         <p className="text-xs text-slate-500">
-                          {new Date(tx.date).toLocaleDateString()} &middot; {tx.category}
+                          {new Date(tx.date).toLocaleDateString()} &middot;{" "}
+                          {tx.category}
                         </p>
                       </div>
-                      <p className="font-semibold text-blue-600">₹{tx.amount}</p>
+                      <p className="font-semibold text-blue-600">
+                        ₹{tx.amount}
+                      </p>
                     </div>
                   </li>
                 ))}

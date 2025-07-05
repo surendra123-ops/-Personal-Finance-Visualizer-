@@ -19,7 +19,11 @@ app.use(express.json());
 // Routes
 
 const transactionRoutes = require("./routes/transactionRoutes");
+const budgetRoutes = require("./routes/budgets");
+
 app.use("/api/transactions", transactionRoutes);
+app.use("/api/budgets", budgetRoutes);
+
 
 app.use("/", (req, res) => {
   res.send("Welcome to the Budget Tracker API!")
