@@ -12,7 +12,12 @@ const transactionSchema = new mongoose.Schema({
   date: {
     type: Date,
     required: true,
-  }
+  },
+  category: {
+    type: String,
+    enum: ["Food", "Bills", "Transport", "Shopping", "Entertainment", "Other"],
+    default: "Other",
+  },
 });
 
 module.exports = mongoose.model("Transaction", transactionSchema);

@@ -105,13 +105,21 @@ const TransactionList = ({ transactions, onDelete, onEdit }) => {
                   <p className="font-medium text-slate-900 truncate">
                     {tx.description}
                   </p>
-                  <p className="text-sm text-slate-500">
-                    {new Date(tx.date).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </p>
+                  <div className="flex items-center gap-2 mt-1 text-sm text-slate-500">
+                    <span>
+                      {new Date(tx.date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                    {/* ✅ Category Badge */}
+                    {tx.category && (
+                      <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                        {tx.category}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <p className="text-lg font-bold text-red-600 flex-shrink-0">

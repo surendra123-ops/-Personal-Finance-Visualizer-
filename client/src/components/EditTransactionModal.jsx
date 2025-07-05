@@ -6,13 +6,18 @@ import {
   DollarSign,
   FileText,
   Calendar,
+  Folder,
   AlertCircle,
 } from "lucide-react";
+
+// ✅ Predefined categories
+const categories = ["Food", "Travel", "Shopping", "Bills", "Entertainment", "Other"];
 
 const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
+  const [category, setCategory] = useState(""); // ✅ New
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -21,6 +26,7 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
       setAmount(transaction.amount.toString());
       setDescription(transaction.description);
       setDate(transaction.date.slice(0, 10));
+      setCategory(transaction.category || ""); // ✅ Load category
     }
   }, [transaction]);
 
@@ -34,6 +40,9 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
     }
     if (!date) {
       newErrors.date = "Date is required";
+    }
+    if (!category) {
+      newErrors.category = "Category is required";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -50,6 +59,7 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
         amount: Number(amount),
         description,
         date,
+        category, // ✅ Include category in update
       });
       setErrors({});
     } catch (error) {
@@ -93,7 +103,6 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
                 whileTap={{ scale: 0.95 }}
                 onClick={handleClose}
                 className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors"
-                aria-label="Close modal"
               >
                 <X className="h-5 w-5 text-slate-600" />
               </motion.button>
@@ -128,7 +137,39 @@ const EditTransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
                 error={errors.date}
               />
 
-              {/* Action Buttons */}
+              {/* ✅ Category Dropdown */}
+              <div className="space-y-2">
+                <label className="flex items-center space-x-2 text-sm font-medium text-slate-700">
+                  <Folder className="h-4 w-4" />
+                  <span>Category</span>
+                </label>
+                <div className="relative">
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className={`w-full px-4 py-3 rounded-xl border-2 bg-white/50 backdrop-blur-sm text-slate-900
+                      ${errors.category ? "border-red-300 focus:border-red-500" : "border-slate-200 focus:border-blue-500"}
+                      focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  {errors.category && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute -bottom-6 left-0 flex items-center space-x-1 text-red-500 text-xs"
+                    >
+                      <AlertCircle className="h-3 w-3" />
+                      <span>{errors.category}</span>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+
+              {/* Buttons */}
               <div className="flex justify-end space-x-3 pt-4">
                 <motion.button
                   type="button"
@@ -193,11 +234,7 @@ const InputField = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 bg-white/50 backdrop-blur-sm
-          ${
-            error
-              ? "border-red-300 focus:border-red-500"
-              : "border-slate-200 focus:border-blue-500"
-          }
+          ${error ? "border-red-300 focus:border-red-500" : "border-slate-200 focus:border-blue-500"}
           focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 placeholder-slate-400`}
       />
       {error && (

@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, Wallet, PlusCircle } from "lucide-react";
+import {
+  TrendingUp,
+  Wallet,
+  PlusCircle,
+  Clock,
+} from "lucide-react";
 import AddTransactionForm from "./components/AddTransactionForm";
 import TransactionList from "./components/TransactionList";
 import ExpenseChart from "./components/ExpenseChart";
+import CategoryPieChart from "./components/CategoryPieChart";
 import EditTransactionModal from "./components/EditTransactionModal";
 import {
   getTransactions,
@@ -76,6 +82,9 @@ function App() {
     0
   );
   const monthlyAverage = transactions.length > 0 ? totalExpenses / 12 : 0;
+  const recentTransactions = [...transactions]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5);
 
   return (
     <div>
@@ -159,7 +168,7 @@ function App() {
             )}
           </AnimatePresence>
 
-          {/* Chart + List */}
+          {/* Charts */}
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -168,6 +177,9 @@ function App() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
               <div className="xl:col-span-1">
                 <ExpenseChart transactions={transactions} />
+                <div className="mt-8">
+                  <CategoryPieChart transactions={transactions} />
+                </div>
               </div>
               <div className="xl:col-span-1">
                 <TransactionList
@@ -177,6 +189,39 @@ function App() {
                 />
               </div>
             </div>
+          )}
+
+          {/* Recent Transactions (Optional Card Style) */}
+          {!isLoading && recentTransactions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mt-12"
+            >
+              <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-500" />
+                Recent Transactions
+              </h2>
+              <ul className="space-y-2">
+                {recentTransactions.map((tx) => (
+                  <li
+                    key={tx._id}
+                    className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow border border-slate-200/50"
+                  >
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="text-slate-800 font-medium">{tx.description}</p>
+                        <p className="text-xs text-slate-500">
+                          {new Date(tx.date).toLocaleDateString()} &middot; {tx.category}
+                        </p>
+                      </div>
+                      <p className="font-semibold text-blue-600">₹{tx.amount}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
           )}
         </div>
 

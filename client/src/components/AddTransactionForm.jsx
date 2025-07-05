@@ -6,12 +6,16 @@ import {
   FileText,
   Calendar,
   AlertCircle,
+  Folder
 } from "lucide-react";
+
+const categories = ["Food", "Travel", "Shopping", "Bills", "Entertainment", "Other"];
 
 const AddTransactionForm = ({ onAdd }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
+  const [category, setCategory] = useState("");
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -26,6 +30,9 @@ const AddTransactionForm = ({ onAdd }) => {
     if (!date) {
       newErrors.date = "Date is required";
     }
+    if (!category) {
+      newErrors.category = "Category is required";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -36,10 +43,16 @@ const AddTransactionForm = ({ onAdd }) => {
 
     setIsSubmitting(true);
     try {
-      await onAdd({ amount: Number(amount), description, date });
+      await onAdd({
+        amount: Number(amount),
+        description,
+        date,
+        category,
+      });
       setAmount("");
       setDescription("");
       setDate("");
+      setCategory("");
       setErrors({});
     } catch (error) {
       console.error("Error adding transaction:", error);
@@ -59,14 +72,11 @@ const AddTransactionForm = ({ onAdd }) => {
         <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl">
           <Plus className="h-5 w-5 text-white" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900">
-          Add New Transaction
-        </h2>
+        <h2 className="text-xl font-bold text-slate-900">Add New Transaction</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Amount */}
           <FormField
             label="Amount"
             icon={<DollarSign className="h-4 w-4" />}
@@ -77,7 +87,6 @@ const AddTransactionForm = ({ onAdd }) => {
             error={errors.amount}
           />
 
-          {/* Description */}
           <FormField
             label="Description"
             icon={<FileText className="h-4 w-4" />}
@@ -88,7 +97,6 @@ const AddTransactionForm = ({ onAdd }) => {
             error={errors.description}
           />
 
-          {/* Date */}
           <FormField
             label="Date"
             icon={<Calendar className="h-4 w-4" />}
@@ -99,6 +107,38 @@ const AddTransactionForm = ({ onAdd }) => {
           />
         </div>
 
+        {/* Category dropdown */}
+        <div className="space-y-2">
+          <label className="flex items-center space-x-2 text-sm font-medium text-slate-700">
+            <Folder className="h-4 w-4" />
+            <span>Category</span>
+          </label>
+          <div className="relative">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-white/50 backdrop-blur-sm text-slate-900
+                ${errors.category ? "border-red-300 focus:border-red-500" : "border-slate-200 focus:border-blue-500"}
+                focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
+            >
+              <option value="">Select Category</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            {errors.category && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute -bottom-6 left-0 flex items-center space-x-1 text-red-500 text-xs"
+              >
+                <AlertCircle className="h-3 w-3" />
+                <span>{errors.category}</span>
+              </motion.div>
+            )}
+          </div>
+        </div>
+
         <div className="flex justify-end">
           <motion.button
             type="submit"
@@ -106,10 +146,9 @@ const AddTransactionForm = ({ onAdd }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl
-              ${
-                isSubmitting
-                  ? "bg-slate-300 text-slate-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700"
+              ${isSubmitting
+                ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700"
               }`}
           >
             {isSubmitting ? (
@@ -143,11 +182,7 @@ const FormField = ({ label, icon, type, placeholder, value, onChange, error }) =
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 bg-white/50 backdrop-blur-sm
-          ${
-            error
-              ? "border-red-300 focus:border-red-500"
-              : "border-slate-200 focus:border-blue-500"
-          }
+          ${error ? "border-red-300 focus:border-red-500" : "border-slate-200 focus:border-blue-500"}
           focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 placeholder-slate-400`}
       />
       {error && (
