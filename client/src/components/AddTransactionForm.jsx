@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion"; // Optional, if using framer-motion
+import { motion } from "framer-motion";
 
 const AddTransactionForm = ({ onAdd }) => {
   const [amount, setAmount] = useState("");
@@ -8,17 +8,16 @@ const AddTransactionForm = ({ onAdd }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!amount || isNaN(amount) || Number(amount) <= 0) {
-      alert("Please enter a valid amount");
+      alert("Please enter a valid amount (must be a positive number).");
       return;
     }
     if (!description.trim()) {
-      alert("Description is required");
+      alert("Description is required.");
       return;
     }
     if (!date) {
-      alert("Date is required");
+      alert("Date is required.");
       return;
     }
 
@@ -31,48 +30,48 @@ const AddTransactionForm = ({ onAdd }) => {
   return (
     <motion.form
       onSubmit={handleSubmit}
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-xl w-full mx-auto bg-white shadow-md rounded-2xl p-6 space-y-4"
+      transition={{ duration: 0.6 }}
+      className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 sm:p-8 space-y-6 border border-gray-200 dark:border-gray-700"
     >
-      <h2 className="text-xl font-bold text-gray-700">Add New Transaction</h2>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">Amount (₹)</label>
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-          placeholder="Enter amount"
-        />
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+        Add New Transaction
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <div>
+          <label className="text-sm text-gray-600 dark:text-gray-300 block mb-1">Amount (₹)</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            placeholder="e.g., 500"
+          />
+        </div>
+        <div>
+          <label className="text-sm text-gray-600 dark:text-gray-300 block mb-1">Description</label>
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            placeholder="e.g., Rent"
+          />
+        </div>
+        <div>
+          <label className="text-sm text-gray-600 dark:text-gray-300 block mb-1">Date</label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+          />
+        </div>
       </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
-        <input
-          type="text"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-          placeholder="e.g. Grocery, Rent"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">Date</label>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-        />
-      </div>
-
       <button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600 transition-all w-full"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-lg font-medium transition-all"
       >
         Add Transaction
       </button>
