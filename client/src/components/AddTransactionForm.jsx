@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Plus, DollarSign, FileText, Calendar, AlertCircle, Folder
 } from "lucide-react";
 
-// Static categories for now
+// Static categories
 const categories = ["Food", "Travel", "Shopping", "Bills", "Entertainment", "Other"];
 
 const AddTransactionForm = ({ onAdd, month }) => {
@@ -15,6 +15,7 @@ const AddTransactionForm = ({ onAdd, month }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Get min/max dates for selected month
   const getMonthLimits = (monthStr) => {
     const [year, month] = monthStr.split("-").map(Number);
     const start = new Date(year, month - 1, 1);
@@ -27,14 +28,31 @@ const AddTransactionForm = ({ onAdd, month }) => {
 
   const { minDate, maxDate } = getMonthLimits(month);
 
+  // 🧠 Auto-fill today's date if selected month == current month
+  useEffect(() => {
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+    const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+
+    if (month === currentMonth) {
+      setDate(todayStr);
+    } else {
+      setDate(""); // or set to minDate if needed
+    }
+  }, [month]);
+
   const validateForm = () => {
     const newErrors = {};
-    if (!amount || isNaN(amount) || Number(amount) <= 0) newErrors.amount = "Please enter a valid amount";
-    if (!description.trim()) newErrors.description = "Description is required";
-    if (!date) newErrors.date = "Date is required";
+    if (!amount || isNaN(amount) || Number(amount) <= 0)
+      newErrors.amount = "Please enter a valid amount";
+    if (!description.trim())
+      newErrors.description = "Description is required";
+    if (!date)
+      newErrors.date = "Date is required";
     else if (date < minDate || date > maxDate)
       newErrors.date = `Date must be between ${minDate} and ${maxDate}`;
-    if (!category) newErrors.category = "Category is required";
+    if (!category)
+      newErrors.category = "Category is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -103,7 +121,6 @@ const AddTransactionForm = ({ onAdd, month }) => {
           />
         </div>
 
-        {/* Category dropdown */}
         <div className="space-y-2">
           <label className="flex items-center space-x-2 text-sm font-medium text-slate-700">
             <Folder className="h-4 w-4" />
