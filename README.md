@@ -1,155 +1,140 @@
 
 
+## 🧾 Personal Finance Visualizer
 
-## 📘 Personal Finance Visualizer
-
-A simple web app to track your personal income/expenses with charts and edit/delete functionality.
-
----
-
-### 🚀 Live Demo
-
-* **Frontend (React + Tailwind)**:
-  👉 [https://personal-finance-visualizer-1-frontend.onrender.com](https://personal-finance-visualizer-1-frontend.onrender.com)
-
-* **Backend (Node.js + Express + MongoDB Atlas)**:
-  👉 [https://personal-finance-visualizer-gdzq.onrender.com](https://personal-finance-visualizer-gdzq.onrender.com)
+A modern, responsive web application to **track expenses**, **set budgets**, and **visualize personal financial data** through intuitive charts and dashboards.
 
 ---
 
-### 🛠 Tech Stack
+### 🚀 Live Preview
 
-| Layer      | Tech Used                    |
-| ---------- | ---------------------------- |
-| Frontend   | React.js, Tailwind CSS, Vite |
-| Backend    | Node.js, Express.js          |
-| Database   | MongoDB Atlas                |
-| Charting   | Recharts                     |
-| Deployment | Render (Frontend & Backend)  |
+> Deploy link : https://personal-finance-visualizer-1-frontend.onrender.com/
 
 ---
 
-### 📂 Project Structure
+## 📦 Tech Stack
+
+* **Frontend:** React.js, Tailwind CSS, Framer Motion, Lucide Icons, Recharts
+* **Backend:** Node.js, Express.js
+* **Database:** MongoDB (Mongoose)
+* **Charting:** Recharts
+* **UI Enhancements:** `shadcn/ui`, `Framer Motion` for animations
+
+
+---
+
+## 📁 Project Structure
 
 ```
-finance-app/
-├── backend/
-│   ├── server.js
-│   ├── models/Transaction.js
-│   └── routes/transactions.js
+├── client/
+│   ├── components/      // Reusable UI Components (AddTransactionForm, ExpenseChart, etc.)
+│   ├── pages/           // Main pages (Dashboard, Budget, History)
+│   └── App.jsx          // Root component
 │
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── AddTransactionForm.jsx
-│   │   │   ├── TransactionList.jsx
-│   │   │   ├── EditTransactionModal.jsx
-│   │   │   └── ExpenseChart.jsx
-│   │   ├── services/api.js
-│   │   └── App.jsx
-│   ├── .env
-│   └── vite.config.js
+├── server/
+│   ├── controllers/     // Route logic
+│   ├── routes/          // API endpoints
+│   └── models/          // Mongoose models
+│
+└── README.md
 ```
 
 ---
 
-### ⚙️ Features
+## ✅ Stage-wise Features
 
-* ✅ Add transactions with amount, description, and date
-* ✅ View all transactions in a list
-* ✅ Edit or delete existing transactions
-* ✅ Bar chart to visualize monthly expenses
-* ✅ Fully responsive design
-* ✅ Persistent data using MongoDB Atlas
+### 🟩 Stage 1: Basic Transaction Tracking
+
+* ➕ Add transactions (amount, date, description)
+* 🗑️ Delete and view transactions
+* 📊 Monthly **bar chart** for total expenses
+* 📋 Transaction list with date filter
+* ✅ Form validations & date limits based on selected month
+* 🌓 Responsive UI with light/dark mode support
+
+### 🟦 Stage 2: Category Management
+
+* 🏷️ Predefined categories: Food, Bills, Transport, etc.
+* 🧮 Assign category when adding a transaction
+* 🥧 Category-wise expense breakdown (planned as pie chart)
+* 📅 Month-based filtering for both charts and lists
+
+### 🟨 Stage 3: Budget Tracking (Completed)
+
+* 📌 Set a monthly budget per category
+* 📉 Compare **budget vs actual spending** per category
+* 📈 Chart: Bar comparison of Budget vs Actual by category
+* 🛑 Alerts (in upcoming stages) if actual spending > budget
+
+> ✅ All charts dynamically respond to the selected month
 
 ---
 
-### 🧪 Local Setup Instructions
 
-#### ✅ Clone Repository
+
+
+
+## 🛠️ Setup Instructions
+
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/surendra123-ops/-Personal-Finance-Visualizer-.git
+git clone https://github.com/your-username/personal-finance-visualizer.git
 cd personal-finance-visualizer
 ```
 
----
-
-#### 📦 Backend Setup
+### 2. Setup Backend (Node.js + Express + MongoDB)
 
 ```bash
-cd backend
+cd server
 npm install
-```
+# Create .env file and add:
+# MONGODB_URI=<your_mongodb_connection>
+# PORT=5000
 
-Create `.env` file:
-
-```env
-PORT=4000
-MONGODB_URI=mongodb+srv://<your-db-uri>
-```
-
-Start server:
-
-```bash
-node server.js
-```
-
----
-
-#### 💻 Frontend Setup
-
-```bash
-cd frontend
-npm install
-```
-
-Create `.env` file:
-
-```env
-VITE_API_URL=http://localhost:4000
-```
-
-Start dev server:
-
-```bash
 npm run dev
 ```
 
----
+### 3. Setup Frontend (React + Tailwind + Recharts)
 
-### 🚀 Deployment Guide (Render)
+```bash
+cd client
+npm install
+npm run dev
+```
 
-#### ✅ Backend on Render
-
-1. Go to [https://render.com](https://render.com)
-2. Create new **Web Service**
-3. Link to GitHub backend folder
-4. Set environment variables:
-
-   * `PORT = 4000`
-   * `MONGODB_URI = your-mongodb-uri`
-5. Set build command: `npm install`
-6. Start command: `node server.js`
+> 📝 Make sure both backend and frontend run on separate ports.
 
 ---
 
-#### ✅ Frontend on Render
+## 🧪 API Endpoints (Sample)
 
-1. Create another **Web Service**
-2. Link to GitHub frontend folder
-3. Set environment variable:
+### 🔁 Transactions
 
-   * `VITE_API_URL = https://<your-backend-app>.onrender.com`
-4. Build command: `npm install && npm run build`
-5. Publish directory: `dist`
+| Method | Endpoint                          | Description               |
+| ------ | --------------------------------- | ------------------------- |
+| GET    | `/api/transactions?month=YYYY-MM` | Get transactions by month |
+| POST   | `/api/transactions`               | Add a new transaction     |
+| DELETE | `/api/transactions/:id`           | Delete a transaction      |
+
+### 💸 Budgets
+
+| Method | Endpoint                     | Description                 |
+| ------ | ---------------------------- | --------------------------- |
+| GET    | `/api/budgets?month=YYYY-MM` | Get budgets for month       |
+| POST   | `/api/budgets`               | Set monthly category budget |
 
 ---
 
 
 
-### ✍️ Author
+---
+
+## 👨‍💻 Developer
 
 **Surendra Yenika**
-🌐 [LinkedIn](https://www.linkedin.com/in/surendra-yenika/)
+
+
+---
+
 
