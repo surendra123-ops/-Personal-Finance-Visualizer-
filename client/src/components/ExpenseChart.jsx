@@ -1,4 +1,3 @@
-// components/ExpenseChart.jsx
 import React from "react";
 import {
   BarChart,

@@ -1,4 +1,3 @@
-// components/CategoryPieChart.jsx
 import React from "react";
 import {
   PieChart,

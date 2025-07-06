@@ -1,4 +1,3 @@
-// components/BudgetChart.jsx
 import React from "react";
 import {
   BarChart,
@@ -12,13 +11,18 @@ import {
 } from "recharts";
 
 const BudgetChart = ({ budgets = [], transactions = [], month }) => {
+  // ✅ Ensure budgets is an array
+  const safeBudgets = Array.isArray(budgets) ? budgets : [];
+
+  // Create budget map from categories
   const budgetMap = {};
-  budgets.forEach((b) => {
+  safeBudgets.forEach((b) => {
     if (b.month === month) {
       budgetMap[b.category] = b.amount;
     }
   });
 
+  // Group actual spending by category
   const actuals = {};
   transactions
     .filter((tx) => tx.date?.startsWith(month))
@@ -28,10 +32,12 @@ const BudgetChart = ({ budgets = [], transactions = [], month }) => {
       actuals[cat] += tx.amount || 0;
     });
 
+  // Union of categories
   const categories = Array.from(
     new Set([...Object.keys(budgetMap), ...Object.keys(actuals)])
   );
 
+  // Create chart data
   const chartData = categories.map((category) => ({
     category,
     Budget: budgetMap[category] || 0,
@@ -39,8 +45,8 @@ const BudgetChart = ({ budgets = [], transactions = [], month }) => {
   }));
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-md border border-slate-200">
-      <h2 className="text-lg font-semibold text-slate-800 mb-4">
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-slate-200/50">
+      <h2 className="text-xl font-semibold text-slate-800 mb-4">
         Budget vs Actual Spending ({month})
       </h2>
       {chartData.length === 0 ? (

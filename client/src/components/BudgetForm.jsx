@@ -1,4 +1,3 @@
-// components/BudgetForm.jsx
 import { useState } from "react";
 import { setBudget } from "../services/budgetApi";
 import { Folder, DollarSign, Check, Calendar } from "lucide-react";
@@ -30,7 +29,7 @@ const BudgetForm = ({ month, onSave }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-xl shadow-md space-y-4 border border-slate-200"
+      className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-slate-200/50 space-y-4"
     >
       <h2 className="font-semibold text-lg text-slate-800">Set Monthly Budget</h2>
 
@@ -48,7 +47,7 @@ const BudgetForm = ({ month, onSave }) => {
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="px-4 py-2 border rounded-xl"
+          className="px-4 py-2 border rounded-xl bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         >
           <option value="">Select Category</option>
           {categories.map((c) => (
@@ -61,7 +60,7 @@ const BudgetForm = ({ month, onSave }) => {
         <input
           type="number"
           placeholder="₹ Amount"
-          className="px-4 py-2 border rounded-xl"
+          className="px-4 py-2 border rounded-xl bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
@@ -69,7 +68,7 @@ const BudgetForm = ({ month, onSave }) => {
 
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
+        className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
       >
         Save Budget
       </button>
